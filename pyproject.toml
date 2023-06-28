@@ -1,0 +1,17 @@
+[project]
+name = "survstack"
+description = "Transform classic surivial data to stacked surivial data"
+version = "0.1.0"
+authors = [
+    { name = "Keith Anthony Boroevich", email = "kaboroevich@gmail.com" }
+]
+dependencies = [
+    "numpy",
+]
+
+[tool.setuptools]
+package-data = {"sample" = ["*.dat"]}
+
+[build-system]
+requires = ["setuptools>=43.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
