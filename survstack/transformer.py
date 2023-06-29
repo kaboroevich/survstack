@@ -1,10 +1,8 @@
 from typing import Optional, Tuple
 from numpy.typing import NDArray
-
 import numpy as np
 
-from .functional import digitize_times, stack_timepoints, stack_eval, \
-    cumulative_risk
+import functional as F
 
 
 class SurvivalStacker:
@@ -36,7 +34,7 @@ class SurvivalStacker:
         if time_step is None:
             self.times = event_times
         else:
-            self.times = digitize_times(event_times, time_step)
+            self.times = F.digitize_times(event_times, time_step)
         return self
 
     def transform(self, X: NDArray, y: Optional[NDArray] = None,
@@ -53,10 +51,10 @@ class SurvivalStacker:
         :return: a tuple containing the predictor matrix and response vector
         """
         if eval:
-            X_stacked = stack_eval(X, self.times)
+            X_stacked = F.stack_eval(X, self.times)
             y_stacked = None
         else:
-            X_stacked, y_stacked = stack_timepoints(X, y, self.times)
+            X_stacked, y_stacked = F.stack_timepoints(X, y, self.times)
         return X_stacked, y_stacked
 
     def fit_transform(self, X: NDArray, y: NDArray):
@@ -71,11 +69,21 @@ class SurvivalStacker:
         self.fit(X, y)
         return self.transform(X, y, eval=False)
 
-    def cumulative_risk(self, estimates):
-        """Generate a cumulative risk matrix from the hazard estimates
+    def cumulative_hazard_function(self, estimates: NDArray):
+        """Calculate the cumulative hazard function from the stacked survival
+        estimates.
 
-        :param estimates: hazard estimates as returned from a model trained on
+        :param estimates: estimates as returned from a model trained on
         an evaluation set
         :return: a cumulative risk matrix for the fitted time-points
         """
-        return cumulative_risk(estimates, self.times)
+        return F.cumulative_hazard_function(estimates, self.times)
+
+    def risk_score(self, estimates: NDArray):
+        """Calculate risk score from stacked survival estimates.
+
+        :param estimates: estimates as returned from a model trained on
+        an evaluation set
+        :return: the risk score
+        """
+        return F.risk_score(estimates, self.times)

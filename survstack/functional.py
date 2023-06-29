@@ -80,16 +80,29 @@ def stack_eval(X: NDArray, times: NDArray) -> NDArray:
     return X_new
 
 
-def cumulative_risk(estimates: NDArray, times: NDArray):
-    """Generate a cumulative risk matrix from the hazard estimates
+def cumulative_hazard_function(estimates: NDArray, times: NDArray):
+    """Calculate the cumulative hazard function from the stacked survival
+    estimates.
 
-    :param estimates: hazard estimates as returned from a model trained on
+    :param estimates: estimates as returned from a model trained on
     an evaluation set
     :param times: array of time points on which the hazard was estimated
-    :return: a cumulative risk matrix for the fitted time-points
+    :return: the cumulative risk matrix for the fitted time-points
     """
     surv_curve = np.cumprod(1 - estimates.reshape(-1, times.shape[0]), axis=1)
     return 1 - surv_curve
+
+
+def risk_score(estimates: NDArray, times: NDArray):
+    """Calculate risk score from stacked survival estimates.
+
+    :param estimates: estimates as returned from a model trained on
+    an evaluation set
+    :param times: array of time points on which the hazard was estimated
+    :return: the risk score
+    """
+    chf = cumulative_hazard_function(estimates, times)
+    return chf.sum(axis=1)
 
 
 def _floor_base(x: float, base: float) -> float:
