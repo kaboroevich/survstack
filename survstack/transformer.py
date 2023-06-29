@@ -2,7 +2,7 @@ from typing import Optional, Tuple
 from numpy.typing import NDArray
 import numpy as np
 
-import functional as F
+from . import functional as F
 
 
 class SurvivalStacker:
@@ -57,16 +57,19 @@ class SurvivalStacker:
             X_stacked, y_stacked = F.stack_timepoints(X, y, self.times)
         return X_stacked, y_stacked
 
-    def fit_transform(self, X: NDArray, y: NDArray):
+    def fit_transform(self, X: NDArray, y: NDArray,
+                      time_step: Optional[float] = None):
         """Fit to data, then transform it.
 
         :param X: survival input samples
         :param y: structured array with two fields. The binary event indicator
             as first field, and time of event or time of censoring as
             second field.
+        :param time_step: a base multiple on which to bin times. If none, the
+            times for all observed events are used.
         :return: a tuple containing the predictor matrix and response vector
         """
-        self.fit(X, y)
+        self.fit(X, y, time_step)
         return self.transform(X, y, eval=False)
 
     def cumulative_hazard_function(self, estimates: NDArray):
