@@ -2,7 +2,7 @@ from typing import Optional, Tuple
 from numpy.typing import NDArray
 import numpy as np
 
-from . import functional as F
+from . import functional as ssf
 
 
 class SurvivalStacker:
@@ -36,12 +36,11 @@ class SurvivalStacker:
         if time_step is None:
             self.times = event_times
         else:
-            self.times = F.digitize_times(event_times, time_step)
+            self.times = ssf.digitize_times(event_times, time_step)
         return self
 
-    def transform(
-        self, X: NDArray, y: Optional[NDArray] = None
-    ) -> Tuple[NDArray, Optional[NDArray]]:
+    def transform(self, X: NDArray, y: Optional[NDArray] = None) \
+            -> Tuple[NDArray, Optional[NDArray]]:
         """Convert the input survival dataset to a stacked survival dataset
 
         :param X: survival input samples
@@ -52,13 +51,15 @@ class SurvivalStacker:
         :return: a tuple containing the predictor matrix and response vector
         """
         if y is None:
-            X_stacked = F.stack_eval(X, self.times)
+            X_stacked = ssf.stack_eval(X, self.times)
             y_stacked = None
         else:
-            X_stacked, y_stacked = F.stack_timepoints(X, y, self.times)
+            X_stacked, y_stacked = ssf.stack_timepoints(X, y, self.times)
         return X_stacked, y_stacked
 
-    def fit_transform(self, X: NDArray, y: NDArray, time_step: Optional[float] = None):
+    def fit_transform(self, X: NDArray, y: NDArray,
+                      time_step: Optional[float] = None) \
+            -> Tuple[NDArray, Optional[NDArray]]:
         """Fit to data, then transform it.
 
         :param X: survival input samples
@@ -72,7 +73,7 @@ class SurvivalStacker:
         self.fit(X, y, time_step)
         return self.transform(X, y)
 
-    def cumulative_hazard_function(self, estimates: NDArray):
+    def cumulative_hazard_function(self, estimates: NDArray) -> NDArray:
         """Calculate the cumulative hazard function from the stacked survival
         estimates.
 
@@ -80,13 +81,13 @@ class SurvivalStacker:
         an evaluation set
         :return: a cumulative risk matrix for the fitted time-points
         """
-        return F.cumulative_hazard_function(estimates, self.times)
+        return ssf.cumulative_hazard_function(estimates, self.times)
 
-    def risk_score(self, estimates: NDArray):
+    def risk_score(self, estimates: NDArray) -> NDArray:
         """Calculate risk score from stacked survival estimates.
 
         :param estimates: estimates as returned from a model trained on
         an evaluation set
         :return: the risk score
         """
-        return F.risk_score(estimates, self.times)
+        return ssf.risk_score(estimates, self.times)
