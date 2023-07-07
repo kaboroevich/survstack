@@ -41,5 +41,15 @@ increased by the number of observed events, while y became a
 single column. The number of rows increases with respect to the
 number of samples still under observation at each time-point.
 
+.. code-block:: bibtex
+
+    @article{Craig2021-or,
+      title={Survival stacking: casting survival analysis as a classification problem},
+      author={Craig, Erin and Zhong, Chenyang and Tibshirani, Robert},
+      journal={arXiv preprint arXiv:2107.13480},
+      year={2021}
+    }
+
+
 ..  _1: https://doi.org/10.48550/arXiv.2107.13480
 ..  _scikit-survival: https://scikit-survival.readthedocs.io/en/stable/
