@@ -1,10 +1,7 @@
-from typing import Tuple
-from numpy.typing import NDArray
-
 import numpy as np
 
 
-def digitize_times(values: NDArray, time_step: float = 1.) -> NDArray:
+def digitize_times(values: np.ndarray, time_step: float = 1.) -> np.ndarray:
     """Generate unique time bin values that cover the input times
     and are rounded to the next time_step multiple
 
@@ -20,8 +17,8 @@ def digitize_times(values: NDArray, time_step: float = 1.) -> NDArray:
     return times
 
 
-def stack_timepoints(X: NDArray, y: NDArray, times: NDArray) -> \
-        Tuple[NDArray, NDArray]:
+def stack_timepoints(X: np.ndarray, y: np.ndarray, times: np.ndarray) -> \
+        tuple[np.ndarray, np.ndarray]:
     """Generate a survival stacked dataset and the accompanying binary outcome
     for a survival dataset for all given timepoints.
 
@@ -40,8 +37,8 @@ def stack_timepoints(X: NDArray, y: NDArray, times: NDArray) -> \
     return X_stacked, y_stacked
 
 
-def _stack_timepoint(X: NDArray, y: NDArray, times: NDArray,
-                     i: int) -> Tuple[NDArray, NDArray]:
+def _stack_timepoint(X: np.ndarray, y: np.ndarray, times: np.ndarray,
+                     i: int) -> tuple[np.ndarray, np.ndarray]:
     """Generate the predictor matrix and response vector for a survival dataset
     at a specific time-point `times[i]`.
 
@@ -66,7 +63,7 @@ def _stack_timepoint(X: NDArray, y: NDArray, times: NDArray,
     return X_new, y_outcome
 
 
-def stack_eval(X: NDArray, times: NDArray) -> NDArray:
+def stack_eval(X: np.ndarray, times: np.ndarray) -> np.ndarray:
     """Generate a predictor matrix for outcome prediction for given times. This
     is to be used for evaluation of a model, not for training.
 
@@ -80,7 +77,8 @@ def stack_eval(X: NDArray, times: NDArray) -> NDArray:
     return X_new
 
 
-def cumulative_hazard_function(estimates: NDArray, times: NDArray):
+def cumulative_hazard_function(estimates: np.ndarray,
+                               times: np.ndarray) -> np.ndarray:
     """Calculate the cumulative hazard function from the stacked survival
     estimates.
 
@@ -93,7 +91,7 @@ def cumulative_hazard_function(estimates: NDArray, times: NDArray):
     return 1 - surv_curve
 
 
-def risk_score(estimates: NDArray, times: NDArray):
+def risk_score(estimates: np.ndarray, times: np.ndarray) -> np.ndarray:
     """Calculate risk score from stacked survival estimates.
 
     :param estimates: estimates as returned from a model trained on
