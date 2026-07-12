@@ -1,5 +1,7 @@
 import numpy as np
 
+from functools import partial
+
 ALLOWED_ENCODINGS: tuple[str, ...] = ("onehot", "continuous")
 
 def digitize_times(values: np.ndarray, time_step: float = 1.) -> np.ndarray:
@@ -102,7 +104,7 @@ def _stack_timepoint_continuous(X: np.ndarray, y: np.ndarray, times: np.ndarray,
     return X_new, y_outcome
 
 
-def stack_eval(X: np.ndarray, times: np.ndarray, time_encoding: str = "onehot") -> np.ndarray:
+def stack_eval(X: np.ndarray, times: np.ndarray, time_encoding: str = "onehot", normalize: bool = False) -> np.ndarray:
     """Generate a predictor matrix for outcome prediction for given times. This
     is to be used for evaluation of a model, not for training.
 
@@ -115,7 +117,7 @@ def stack_eval(X: np.ndarray, times: np.ndarray, time_encoding: str = "onehot") 
         raise ValueError(f"time_encoding must be one of {ALLOWED_ENCODINGS!r} got {time_encoding!r}")
     encode_funcs = {
         'onehot': _encode_onehot,
-        'continuous': _encode_continuous
+        'continuous': partial(_encode_continuous, normalize=normalize)
     }
     X_cov = np.repeat(X, times.shape[0], axis=0)
     X_risk = encode_funcs[time_encoding](times, X.shape[0])

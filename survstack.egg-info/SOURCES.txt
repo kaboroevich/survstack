@@ -1,0 +1,11 @@
+LICENSE
+README.md
+pyproject.toml
+survstack/__init__.py
+survstack/functional.py
+survstack/transformer.py
+survstack.egg-info/PKG-INFO
+survstack.egg-info/SOURCES.txt
+survstack.egg-info/dependency_links.txt
+survstack.egg-info/requires.txt
+survstack.egg-info/top_level.txt
