@@ -1,8 +1,0 @@
-Metadata-Version: 2.4
-Name: survstack
-Version: 0.1.0
-Summary: Transform classic surivial data to stacked surivial data
-Author-email: Keith Anthony Boroevich <kaboroevich@gmail.com>
-License-File: LICENSE
-Requires-Dist: numpy
-Dynamic: license-file

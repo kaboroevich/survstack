@@ -108,9 +108,10 @@ def stack_eval(X: np.ndarray, times: np.ndarray, time_encoding: str = "onehot", 
     """Generate a predictor matrix for outcome prediction for given times. This
     is to be used for evaluation of a model, not for training.
 
-    :param X: Survival input samples
+    :param X: survival input samples
     :param times: array of time points on which to create risk sets
     :param time_encoding: encoding to use for timepoints {"onehot","continuous"}
+    :param normalize: scale times to [0, 1] for "continuous" encoding
     :return: a generalized predictor matrix for input X
     """
     if time_encoding not in ALLOWED_ENCODINGS:
