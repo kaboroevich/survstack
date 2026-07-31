@@ -1,5 +1,7 @@
 import numpy as np
 
+from functools import partial
+
 ALLOWED_ENCODINGS: tuple[str, ...] = ("onehot", "continuous")
 
 def digitize_times(values: np.ndarray, time_step: float = 1.) -> np.ndarray:
@@ -102,20 +104,21 @@ def _stack_timepoint_continuous(X: np.ndarray, y: np.ndarray, times: np.ndarray,
     return X_new, y_outcome
 
 
-def stack_eval(X: np.ndarray, times: np.ndarray, time_encoding: str = "onehot") -> np.ndarray:
+def stack_eval(X: np.ndarray, times: np.ndarray, time_encoding: str = "onehot", normalize: bool = False) -> np.ndarray:
     """Generate a predictor matrix for outcome prediction for given times. This
     is to be used for evaluation of a model, not for training.
 
-    :param X: Survival input samples
+    :param X: survival input samples
     :param times: array of time points on which to create risk sets
     :param time_encoding: encoding to use for timepoints {"onehot","continuous"}
+    :param normalize: scale times to [0, 1] for "continuous" encoding
     :return: a generalized predictor matrix for input X
     """
     if time_encoding not in ALLOWED_ENCODINGS:
         raise ValueError(f"time_encoding must be one of {ALLOWED_ENCODINGS!r} got {time_encoding!r}")
     encode_funcs = {
         'onehot': _encode_onehot,
-        'continuous': _encode_continuous
+        'continuous': partial(_encode_continuous, normalize=normalize)
     }
     X_cov = np.repeat(X, times.shape[0], axis=0)
     X_risk = encode_funcs[time_encoding](times, X.shape[0])
@@ -128,9 +131,11 @@ def _encode_onehot(times: np.ndarray, n_samples: int) -> np.ndarray:
     return np.tile(np.eye(times.shape[0]), (n_samples, 1))
 
 
-def _encode_continuous(times: np.ndarray, n_samples: int) -> np.ndarray:
-    """Tile a normalized time vector for continuous time encoding."""
-    return np.tile(times / times[-1], n_samples).reshape(-1, 1)
+def _encode_continuous(times: np.ndarray, n_samples: int, normalize: bool = False) -> np.ndarray:
+    """Tile a (optionally normalized) time vector for continuous time encoding."""
+    if normalize:
+        times = times / times[-1]
+    return np.tile(times, n_samples).reshape(-1, 1)
 
 
 def cumulative_hazard_function(estimates: np.ndarray, times: np.ndarray) -> np.ndarray:
