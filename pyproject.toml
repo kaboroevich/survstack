@@ -1,7 +1,7 @@
 [project]
 name = "survstack"
 description = "Transform classic surivial data to stacked surivial data"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     { name = "Keith Anthony Boroevich", email = "kaboroevich@gmail.com" }
 ]
