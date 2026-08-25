@@ -6,7 +6,8 @@ ALLOWED_ENCODINGS: tuple[str, ...] = ("onehot", "continuous")
 
 def digitize_times(values: np.ndarray, time_step: float = 1.) -> np.ndarray:
     """Generate unique time bin values that cover the input times
-    and are rounded to the next time_step multiple
+    and are rounded up to the next time_step multiple. The returned
+    values act as the right (inclusive) edges of the discrete time bins.
 
     :param values: an array of times
     :param time_step: a step value for which the final bins will be based
@@ -59,6 +60,10 @@ def _stack_timepoint_onehot(X: np.ndarray, y: np.ndarray, times: np.ndarray,
     """Generate the predictor matrix and response vector for a survival dataset
     at a specific time-point `times[i]`.
 
+    Times are treated as the right (inclusive) edges of the discrete time bins,
+    so an observation with time ``t`` is assigned to the bin ``times[k]`` where
+    ``k`` is the smallest index with ``t <= times[k]``.
+
     :param X: training input samples
     :param y: structured array with two fields. The binary event indicator
         as first field, and time of event or time of censoring as second field.
@@ -67,7 +72,7 @@ def _stack_timepoint_onehot(X: np.ndarray, y: np.ndarray, times: np.ndarray,
     :return: a tuple containing the predictor matrix and response vector
     """
     event_field, time_field = y.dtype.names
-    y_bins = np.searchsorted(times, y[time_field], side='right') - 1
+    y_bins = np.searchsorted(times, y[time_field], side='left')
     y_bins = np.clip(y_bins, 0, times.size - 1)
     X_i = X[y_bins >= i, :]
     y_i = y[y_bins >= i]
@@ -84,6 +89,10 @@ def _stack_timepoint_continuous(X: np.ndarray, y: np.ndarray, times: np.ndarray,
     """Generate the predictor matrix and response vector for a survival dataset
     at a specific time-point `times[i]`.
 
+    Times are treated as the right (inclusive) edges of the discrete time bins,
+    so an observation with time ``t`` is assigned to the bin ``times[k]`` where
+    ``k`` is the smallest index with ``t <= times[k]``.
+
     :param X: training input samples
     :param y: structured array with two fields. The binary event indicator
         as first field, and time of event or time of censoring as second field.
@@ -92,7 +101,7 @@ def _stack_timepoint_continuous(X: np.ndarray, y: np.ndarray, times: np.ndarray,
     :return: a tuple containing the predictor matrix and response vector
     """
     event_field, time_field = y.dtype.names
-    y_bins = np.searchsorted(times, y[time_field], side='right') - 1
+    y_bins = np.searchsorted(times, y[time_field], side='left')
     y_bins = np.clip(y_bins, 0, times.size - 1)
     risk_mask = y_bins >= i
     X_i = X[risk_mask, :]
